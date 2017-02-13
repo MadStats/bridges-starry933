@@ -22,33 +22,22 @@ for(back in 1:25){
 
 
 # unzip all the local data paths:
-paths = dir("c:/data", pattern =".zip")
-setwd("data")
+paths = dir("C:/data", pattern =".zip")
+setwd("C:/data")
 localFiles=list()
 for(i in 1:length(paths)){
   localFiles[[i]]= unzip(paths[i])  # localFiles[[i]] stores the path
   print(localFiles[[i]])
 } 
 
-
+# Get Maintenance data
 for(i in 1:length(paths)){
   # select the txt file (there are some .xls files)
   thisIsTheTXT = grep(pattern = ".txt",x = localFiles[[i]])
-#  dat = fread(localFiles[[i]][thisIsTheTXT]) %>% as.tbl
-#  tmp = dat %>% mutate(fips = 1000*STATE_CODE_001 + as.numeric(COUNTY_CODE_003),
-#                       good = pmin(SUPERSTRUCTURE_COND_059, SUBSTRUCTURE_COND_060, CHANNEL_COND_061,CULVERT_COND_062, 
-#                                   na.rm = T) > 4
-#  ) %>%
-#    group_by(fips) %>% summarize(good = mean(good), count = n(), maxTraffic = max(ADT_029))
-#  write_csv(tmp,path =  paste("small_his", str(year), ".csv",sep = ""))
-  
   dat = fread(localFiles[[i]][thisIsTheTXT]) %>% as.tbl
-#  tmp = dat %>% mutate(fips = 1000*STATE_CODE_001 + as.numeric(COUNTY_CODE_003),
-#                       
-#  ) %>%
   tmp = dat %>% group_by(MAINTENANCE_021) %>% summarize(count = n())
 
-  write_csv(tmp,path =  paste("small_maintain", substr(paths[[i]],1,4), ".csv",sep = ""))
+  write_csv(tmp,path =  paste("small", substr(paths[[i]],1,4), ".csv",sep = ""))
 }
 
 # make the data set by combining smallXXXX.csv files.
@@ -60,6 +49,6 @@ addYearCSV = function(path){
   tmp = mutate(tmp, year = year)
   return(tmp)
 }
-x25 = ldply(csvpaths,  addYearCSV )
+x25 = ldply(csvpaths,  addYearCSV)
 write_csv(x25, path = "countyBridgeSummaries_Jill.csv")
 setwd("..")
